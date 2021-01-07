@@ -4,8 +4,38 @@ param(
 [string] $owner,
 [string] $user,
 [string] $folder,
-[string] $connect
+[string] $connect,
+[string] $recursive
+
 )
+
+
+
+
+function set-outlookacl {
+
+ # Check if user already in ACL 
+        $acl=get-mailboxfolderpermission $fname -user $user  
+
+
+        if( $acl)
+            {
+            "User in ACL alreay present!"
+            $acl
+            " 
+            "
+            "Should we delete this Entry?"
+
+            $input = read-host "Enter ENTER to confirm deletetion
+Enter other key to continue without deleting acl-entry "
+            if($input -eq "")
+                {
+                remove-mailboxfolderpermission $fname -user $user -confirm:$false
+            }
+        }
+
+        Add-MailboxFolderPermission $fname -user $user -AccessRights owner
+}
 
 
 "
@@ -22,7 +52,7 @@ Otherwise, get-mailboxfolderpermission will fail!
 "
 
 $input=Read-host "
-Type key and hit ENTER to connect to Exchange Online now
+Type any key and hit ENTER to connect to Exchange Online now
 Just hit Enter to continue without connecting"
 
 
@@ -61,35 +91,30 @@ if( $user -and $owner -and $folder -and $folder_with_slash){
 
 
 
-foreach ( $f in ( Get-MailboxFolderStatistics $owner | where {$_.FolderPath.contains($folder_with_slash) -eq $true } )) 
-{#$f; 
-$fname = $owner + ":" + $f.FolderPath.replace("/","\");
-"
-Ordner"
-$fname; 
+# recursive
+if($recursive){
+    foreach ( $f in ( Get-MailboxFolderStatistics $owner | where {$_.FolderPath.contains($folder_with_slash) -eq $true } )) 
+        {#$f; 
+        $fname = $owner + ":" + $f.FolderPath.replace("/","\");
+        ""
+        "Ordner"
+        $fname; 
+        set-outlookacl 
 
-
-# Check if user already in ACL 
-$acl=get-mailboxfolderpermission $fname -user $user  
-
-
-if( $acl)
-{
-    "User in ACL alreay present!"
-    $acl
-    $input = read-host " 
-Should we delete this Entry?
-Enter ENTER to confirm deletetion
-Enter other key to continue without deleting acl-entry "
-    if($input -eq "")
-        {
-        remove-mailboxfolderpermission $fname -user $user -confirm:$false
-    }
-
-    Add-MailboxFolderPermission $fname -user $user -AccessRights owner}
-
+       
     }
 }
+
+
+else  
+# not recursive but single path
+    {$fname= $owner + ":" + $folder;
+    set-outlookacl 
+
+}
+}
+
+
 else{
 
 
