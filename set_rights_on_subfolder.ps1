@@ -4,7 +4,6 @@ param(
 [string] $owner,
 [string] $user,
 [string] $folder,
-[string] $connect,
 [string] $recursive
 
 )
@@ -70,6 +69,7 @@ if (! $folder -and ! $owner ){
 	write-host(" -folder subfolder in Outlook on which user should get access ] ")
     " Examplse: \Posteingang    \Posteingang\Subfolder \Inbox\Subfolder "
     write-host(" -user Username of user, who should get permissions] ")
+    write-host(" -recursive $true : set acl entry for all subfolder of folder")
 	exit
 }
 
