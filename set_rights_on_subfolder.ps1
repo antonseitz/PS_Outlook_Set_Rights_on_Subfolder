@@ -4,6 +4,7 @@ param(
 [string] $owner,
 [string] $user,
 [string] $folder,
+[string] $permission,
 [string] $recursive
 
 )
@@ -25,15 +26,16 @@ function set-outlookacl {
             "
             "Should we delete this Entry?"
 
-            $input = read-host "Enter ENTER to confirm deletetion
-Enter other key to continue without deleting acl-entry "
-            if($input -eq "")
+            $input = read-host "Enter DELETE and ENTER to confirm deletetion
+Hit ENTER to continue without deleting acl-entry "
+            if($input -eq "DELETE")
                 {
                 remove-mailboxfolderpermission $fname -user $user -confirm:$false
             }
         }
 
-        Add-MailboxFolderPermission $fname -user $user -AccessRights owner
+        Add-MailboxFolderPermission $fname -user $user -AccessRights $permission
+        #get-mailboxfolderpermission ($owner + ":" + $folder)
 }
 
 
@@ -86,7 +88,6 @@ $folder_with_slash=$folder.Replace("\","/")
 if( $user -and $owner -and $folder -and $folder_with_slash){
 
 
-#$folders=Get-MailboxFolderStatistics $owner
 
 
 
